@@ -6,11 +6,11 @@
 #define MYTINYSTL_VECTOR_H
 #include "iterator.h"
 
-
-
-template <class T>
-class vector{
-
-};
+namespace mystl{
+    class vector{
+    public:
+        typedef mystl::
+    };
+}
 
 #endif //MYTINYSTL_VECTOR_H
