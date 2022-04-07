@@ -1,0 +1,9 @@
+//
+// Created by hbin on 2022/4/7.
+//
+
+#ifndef MYTINYSTL_UNINITIALIZED_H
+#define MYTINYSTL_UNINITIALIZED_H
+
+
+#endif //MYTINYSTL_UNINITIALIZED_H

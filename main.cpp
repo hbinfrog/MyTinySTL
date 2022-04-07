@@ -1,9 +1,12 @@
 #include <iostream>
+#include <stdio.h>
 #include "construct.h"
 #include "allocator.h"
 #include "util.h"
+#include "algobase.h"
+#include "vector.h"
+#include <string>
 using namespace mystl;
-#include <iterator>
 
 
 
@@ -12,14 +15,27 @@ void init(int * a){
 }
 class test{
 public:
-    int * age;
-    test(int Age){
-        age = new int (Age);
-    }
-    ~test(){
-        ::delete(age);
+    int age;
+    int score;
+    test(int Age, int Score){
+        this->age = Age;
+        this->score = Score;
     }
 
+    ~test(){}
+
+};
+bool operator<(const test& t1, const test& t2){
+    return t1.score < t2.score;
+}
+class MyCompare{
+public:
+    bool operator()(const test& a, const test& b){
+        return a < b ? true : false;
+    }
+    bool operator()(int a, int b){
+        return a < b ? true : false;
+    }
 };
 pair<int, char> test1(){
     pair<int, char> c(10,'s');
@@ -29,20 +45,15 @@ pair<int, char> test1(){
 
 
 int main() {
-    pair<int, char> p1(100,'a');
-    pair<int, char> p2(100,'b');
-    pair<int, char> p3;
-    pair<char, int> p6;
-    p6.operator=(p1);
-    std::cout << p6.first << " " << p6.second << std::endl;
-    //p6.operator=(test1());//wrong
-    //std::cout << p6.first << " " << p6.second << std::endl;
-    bool res = p1 <= p2;
-    std::cout << res << std::endl;
-    int a = 233;
-    char c = 'g';
-    pair<int, char> ac = make_pair(a,c);
-    std::cout << ac.first << " " << ac.second << std::endl;
+    char dest[] = "oldstring";
+    char src[]  = "newstring";
+    char * c = mystl::unchecked_copy(src,src + 9,dest);
+    size_t n = 34;
+    vector<int> v(n);
+    printf("%d\n", v.size());
+    printf("%d\n", v.capasity());
+
+
 
     return 0;
 }

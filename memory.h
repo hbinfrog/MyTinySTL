@@ -5,4 +5,6 @@
 #ifndef MYTINYSTL_MEMORY_H
 #define MYTINYSTL_MEMORY_H
 
+
+
 #endif //MYTINYSTL_MEMORY_H

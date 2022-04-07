@@ -1,5 +1,6 @@
 # 基于C++11的STL项目
-参考资料：《STL源码解析》，[test](https://github.com/Alinshans/MyTinySTL)
+参考资料：《STL源码解析》，[Alinshans/MyTinySTL](https://github.com/Alinshans/MyTinySTL)
+
 主要思路：
 
 - 实现配置器
