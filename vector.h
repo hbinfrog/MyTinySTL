@@ -9,6 +9,8 @@
 #include "util.h"
 #include "allocator.h"
 #include "memory.h"
+#include "algobase.h"
+#include "exceptdef.h"
 
 
 
@@ -32,9 +34,9 @@ namespace mystl{
 
 
     private:
-        iterator begin;
-        iterator end;
-        iterator cap;
+        iterator begin_;
+        iterator end_;
+        iterator cap_;
     public:
         vector() noexcept{
             init();
@@ -42,45 +44,82 @@ namespace mystl{
         explicit vector(size_type n){
             fill_init(n, value_type());
         }
+        vector(size_type n, const value_type& val){
+            fill_init(n,val);
+        }
+        template <class Iter, typename std::enable_if<mystl::is_input_iterator<Iter>::value, int>::type = 0>
+        vector(Iter first, Iter last)
+        {
+            MYSTL_DEBUG(!(last < first));
+            range_init(first, last);
+        }
+        vector(const vector& rhs){
+            range_init(rhs.begin_, rhs.end_);
+        }
+
         size_type size(){
-            return static_cast<size_type>(end - begin);
+            return static_cast<size_type>(end_ - begin_);
         }
         size_type capasity(){
-            return static_cast<size_type>(cap - begin);
+            return static_cast<size_type>(cap_ - begin_);
         }
+        reference operator[](size_type n){
+            MYSTL_DEBUG(n < size());
+            return *(begin_ + n);
+        }
+        const_reference operator[](size_type n) const{
+            MYSTL_DEBUG(n < size());
+            return *(begin_ + n);
+        }
+        iterator begin() noexcept{
+            return begin_;
+        }
+        const_iterator begin() const noexcept{
+            return begin_;
+        }
+        iterator end() noexcept{
+            return end_;
+        }
+        const iterator end() const noexcept{
+            return end_;
+        }
+
 
     private:
         void init() noexcept;
-        void init_space(size_type size, size_type cap);
+        void init_space(size_type size, size_type cap_);
         void fill_init(size_type n, const value_type& value);
+
+        template<class Iter>
+        void range_init(Iter first, Iter last);
     };
 
 
     template <class T>
     void vector<T>::init() noexcept {
         try{
-            begin = data_allocator::allocate(16);
-            end = begin;
-            cap = begin + 16;
+            begin_ = data_allocator::allocate(16);
+            end_ = begin_;
+            cap_ = begin_ + 16;
         }
         catch (...){
-            begin = nullptr;
-            end = nullptr;
-            cap = nullptr;
+            begin_ = nullptr;
+            end_ = nullptr;
+            cap_ = nullptr;
         }
 
     }
     template <class T>
-    void vector<T>::init_space(size_type size, size_type capa){
+    void vector<T>::init_space(size_type size, size_type cap){
         try{
-            begin = data_allocator::allocate(capa);
-            end = begin + size;
-            cap = begin + capa;
+            begin_ = data_allocator::allocate(cap);
+            end_ = begin_ + size;
+            cap_ = begin_ + cap;
         }
         catch (...){
-            begin = nullptr;
-            end = nullptr;
-            cap = nullptr;
+            begin_ = nullptr;
+            end_ = nullptr;
+            cap_ = nullptr;
             throw;
         }
     }
@@ -88,8 +127,14 @@ namespace mystl{
     void vector<T>::fill_init(size_type n, const value_type &value){
         const size_type init_size = mystl::max(static_cast<size_type>(16), n);
         init_space(n, init_size);
-
-
+        mystl::fill_n(begin_, n, value);
+    }
+    template <class T>
+    template<class Iter>
+    void vector<T>::range_init(Iter first, Iter last){
+        const size_type init_size = mystl::max(static_cast<size_type>(last - first), static_cast<size_type>(16));
+        init_space(last - first, init_size);
+        mystl::copy(first,last,begin_);
 
     }
 

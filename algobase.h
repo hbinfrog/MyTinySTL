@@ -95,7 +95,33 @@ namespace mystl{
         }
         return result;
     }
-
+    template <class OutputIter, class Size, class T>
+    OutputIter unchecked_fill_n(OutputIter first, Size n, const T& val){
+        while(n > 0){
+            *first = val;
+            --n;
+            ++first;
+        }
+        return first;
+    }
+    template <class Tp, class Size, class Up>
+    typename std::enable_if<
+            std::is_integral<Tp>::value && sizeof(Tp) == 1 &&
+            !std::is_same<Tp, bool>::value &&
+            std::is_integral<Up>::value && sizeof(Up) == 1,
+            Tp*>::type
+    unchecked_fill_n(Tp* first, Size n, Up value)
+    {
+        if (n > 0)
+        {
+            std::memset(first, (unsigned char)value, (size_t)(n));
+        }
+        return first + n;
+    }
+    template <class OutputIter, class Size, class T>
+    OutputIter fill_n(OutputIter first, Size n, const T& val){
+        return unchecked_fill_n(first,n,val);
+    }
 
 
 
