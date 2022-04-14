@@ -11,6 +11,7 @@
 #include "memory.h"
 #include "algobase.h"
 #include "exceptdef.h"
+#include "uninitialized.h"
 
 
 
@@ -56,6 +57,22 @@ namespace mystl{
         vector(const vector& rhs){
             range_init(rhs.begin_, rhs.end_);
         }
+        vector(vector&& rhs) noexcept : begin_(rhs.begin_), end_(rhs.end_), cap_(rhs.cap_){
+            rhs.begin_ = nullptr;
+            rhs.end_ = nullptr;
+            rhs.end_ = nullptr;//the source of rvalue type should be nullptr
+        }
+        vector(std::initializer_list<value_type> initlist){
+            range_init(initlist.begin(),initlist.end());
+        }
+        vector& operator=(vector& rhs);
+        vector& operator=(vector&& rhs) noexcept;
+        vector& operator=(std::initializer_list<value_type> initlist);
+        void swap(vector& rhs) noexcept;
+        bool operator==(vector& rhs);
+        bool operator!=(vector& rhs);
+
+
 
         size_type size(){
             return static_cast<size_type>(end_ - begin_);
@@ -82,6 +99,12 @@ namespace mystl{
         }
         const iterator end() const noexcept{
             return end_;
+        }
+        iterator cap() noexcept{
+            return cap_;
+        }
+        const iterator cap() const noexcept{
+            return cap_;
         }
 
 
@@ -127,7 +150,7 @@ namespace mystl{
     void vector<T>::fill_init(size_type n, const value_type &value){
         const size_type init_size = mystl::max(static_cast<size_type>(16), n);
         init_space(n, init_size);
-        mystl::fill_n(begin_, n, value);
+        mystl::uninitialized_fill_n(begin_, n, value);
     }
     template <class T>
     template<class Iter>
@@ -137,7 +160,71 @@ namespace mystl{
         mystl::copy(first,last,begin_);
 
     }
+    template <class T>
+    void vector<T>::swap(vector<T> &rhs) noexcept{
+        if(this->operator!=(rhs)){
+            mystl::swap(this->begin_, rhs.begin_);
+            mystl::swap(this->end_, rhs.end_);
+            mystl::swap(this->cap_, rhs.cap_);
+        }
 
+    }
+    template <class T>
+    vector<T>& vector<T>::operator=(vector& rhs) {
+        if(this->operator!=(rhs)){
+            const auto len = rhs.size();
+            if(this->capasity() < len){
+                vector temp(rhs.begin(),rhs.end());
+                this->swap(temp);
+            }
+            else if(len <= this->size()){
+                auto i = mystl::copy(rhs.begin(), rhs.end(), this->begin_);
+                data_allocator::destroy(i, this->end_);
+                end_ = begin_ + len;
+            }
+            else{
+                mystl::copy(rhs.begin(), rhs.begin() + this->size(), this->begin_);
+                mystl::uninitialized_copy(rhs.begin() + this->size(), rhs.end(), this->end_);
+                end_ = begin_ + len;
+                cap_ = end_;
+            }
+        }
+        return *this;
+
+    }
+    template <class T>
+    vector<T>& vector<T>::operator=(vector&& rhs) noexcept{
+        data_allocator::destroy(begin_, end_);
+        data_allocator::deallocate(begin_, cap_ - begin_);//似乎没有什么作用
+        this->begin_ = rhs.begin_;
+        this->end_ = rhs.end_;
+        this->cap_ = rhs.cap_;
+        rhs.begin_ = nullptr;
+        rhs.end_ = nullptr;
+        rhs.cap_ = nullptr;
+        return *this;
+    }
+    template <class T>
+    bool vector<T>::operator==(vector<T> &rhs) {
+        return this->size() == rhs.size() && mystl::equal(this->begin_, this->end_, rhs.begin_);
+    }
+    template <class T>
+    bool vector<T>::operator!=(vector<T> &rhs) {
+        return (this->size() != rhs.size() || !mystl::equal(this->begin_, this->end_, rhs.begin_));
+    }
+
+//    template <class T>
+//    bool operator==(const vector<T>& lhs, const vector<T>& rhs)
+//    {
+//        return lhs.size() == rhs.size() &&
+//               mystl::equal(lhs.begin(), lhs.end(), rhs.begin());
+//    }
+//
+//    template <class T>
+//    bool operator!=(const vector<T>& lhs, const vector<T>& rhs)
+//    {
+//        return !(lhs == rhs);
+//    }
 }
 
 #endif //MYTINYSTL_VECTOR_H

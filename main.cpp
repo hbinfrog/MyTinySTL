@@ -15,30 +15,34 @@ using std::endl;
 void init(int * a){
     ::new ((void *) a) int(2);
 }
-class test{
+class student{
 public:
-    int age;
-    int score;
-    test(int Age, int Score){
-        this->age = Age;
-        this->score = Score;
+    int Age;
+    int *Score;
+    student(int age, int score){
+        Age = age;
+        Score = new int (score);
     }
-
-    ~test(){}
-
+    student(const student& s){
+        Age = s.Age;
+        Score = new int (*s.Score);
+    }
+    student& operator=(const student& s){
+        Age = s.Age;
+        Score = new int (*s.Score);
+        return *this;
+    }
+    bool operator!=(const student& s){
+        return (Age == s.Age && Score == s.Score);
+    }
+    ~student(){
+        if(Score != nullptr){
+            delete Score;
+            Score = nullptr;
+        }
+    }
 };
-bool operator<(const test& t1, const test& t2){
-    return t1.score < t2.score;
-}
-class MyCompare{
-public:
-    bool operator()(const test& a, const test& b){
-        return a < b ? true : false;
-    }
-    bool operator()(int a, int b){
-        return a < b ? true : false;
-    }
-};
+
 pair<int, char> test1(){
     pair<int, char> c(10,'s');
     return c;
@@ -50,27 +54,34 @@ void show(vector<int> v){
     cout << endl;
 
 }
+void show(vector<student> vs){
+    for (vector<student>::iterator it = vs.begin(); it != vs.end(); it++) {
+        cout << *it->Score << " " << it->Age << " ";
+
+    }
+    cout << endl;
+}
+vector<int> test(){
+    vector<int> v(10,2);
+    return v;
+}
 
 
 
 
 int main() {
-//    char dest[] = "oldstring";
-//    char src[]  = "newstring";
-//    char * c = mystl::unchecked_copy(src,src + 9,dest);
-    int a[] = {1,2,3,4,5};
-    size_t n = 5;
-    vector<int> v(n, 1);
-    v[4] = 2;
-    show(v);
-    vector<int> v2(v);
-    show(v2);
-    printf("%d\n", v2[4]);
-    vector<int> v3(a, a+5);
-    show(v3);
-
-    printf("%d\n", v.size());
-    printf("%d\n", v.capasity());
+    //vector<int> v5
+    student s1(23,95);
+    vector<student> vs(5, s1);
+    show(vs);
+    student s2(21,100);
+    vector<student> vs1(10,s2);
+    cout << vs.size() << endl;
+    cout << vs.capasity() << endl;
+    vs1 = vs;
+    show(vs1);
+    int&& v = 10;
+    int n = v;
 
 
 

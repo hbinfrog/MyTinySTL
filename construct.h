@@ -6,21 +6,23 @@
 #define MYTINYSTL_CONSTRUCT_H
 #include <new>
 #include "iterator.h"
+#include "util.h"
 
 
 namespace mystl{
     template <typename T>
     void construct(T * ptr){
-        ::new (ptr) T();/*在堆区创建了一个新的数据，默认值，跟int * a = new int();的作用差不多
+        ::new ((void *)ptr) T();/*在堆区创建了一个新的数据，默认值，跟int * a = new int();的作用差不多
                         但是这里用int * a = new int();不能够起作用*/
     }
     template <typename T1, typename T2>
     void construct(T1 * ptr, const T2& value){
-        ::new (ptr) T1(value);//new前面加不加::
+        ::new ((void *)ptr) T1(value);//new前面加不加::
     }
     template <typename T1, typename... Args>
     void construct(T1* ptr, Args&&...args){
         //
+        ::new ((void*)ptr) T1(mystl::forward<Args>(args)...);
     }
     template <typename T>
     void destroy_one(T * pointer, std::true_type){}
@@ -31,9 +33,12 @@ namespace mystl{
         }
     }
     template <typename T>
+    void destroy(T * ptr);
+    template <typename T>
     void destroy_sec(T first, T last, std::true_type){}
     template <typename T>
     void destroy_sec(T first, T last, std::false_type){
+        //for(; first != last)
         while(first != last){
             destroy(&*first);
             first++;

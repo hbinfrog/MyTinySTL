@@ -28,7 +28,7 @@ namespace mystl{
         static void construct(pointer ptr, T&& value);
 
         template<class... Args>
-                static void construct(pointer ptr, Args&& ...args);
+        static void construct(pointer ptr, Args&& ...args);
         static void destroy(pointer ptr);
         static void destroy(pointer first, pointer last);
 
@@ -50,14 +50,14 @@ namespace mystl{
     void allocator<T>::deallocate(T * ptr){
         if(ptr == nullptr)
             return;
-        operator delete(ptr);
+        ::operator delete(ptr);
 
     }
     template <class T>
     void allocator<T>::deallocate(T * ptr, size_type n){
         if(ptr == nullptr)
             return;
-        operator delete(ptr);
+        ::operator delete(ptr);
 
     }
 
