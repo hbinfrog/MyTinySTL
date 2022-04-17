@@ -161,7 +161,24 @@ namespace mystl{
     OutputIter unchecked_move(InputIter first, InputIter last, OutputIter result){
         return unchecked_move_sec(first, last, result, iterator_category(first));
     }
+    template <class Tp, class Up>
+    typename std::enable_if<
+            std::is_same<typename std::remove_const<Tp>::type, Up>::value &&
+            std::is_trivially_move_assignable<Up>::value,
+            Up*>::type
+    unchecked_move(Tp* first, Tp* last, Up* result)
+    {
+        const size_t n = static_cast<size_t>(last - first);
+        if (n != 0)
+            std::memmove(result, first, n * sizeof(Up));
+        return result + n;
+    }
 
+    template <class InputIter, class OutputIter>
+    OutputIter move(InputIter first, InputIter last, OutputIter result)
+    {
+        return unchecked_move(first, last, result);
+    }
 
 
 

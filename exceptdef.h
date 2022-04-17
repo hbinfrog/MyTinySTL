@@ -5,7 +5,6 @@
 #ifndef MYTINYSTL_EXCEPTDEF_H
 #define MYTINYSTL_EXCEPTDEF_H
 #include <stdexcept>
-
 #include <cassert>
 
 namespace mystl

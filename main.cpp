@@ -40,6 +40,7 @@ public:
             delete Score;
             Score = nullptr;
         }
+        cout << 1 << endl;
     }
 };
 
@@ -65,23 +66,20 @@ vector<int> test(){
     vector<int> v(10,2);
     return v;
 }
+template <class T>
+T add(T x, T y){
+    return x + y;
+}
 
 
 
 
 int main() {
-    //vector<int> v5
-    student s1(23,95);
-    vector<student> vs(5, s1);
-    show(vs);
-    student s2(21,100);
-    vector<student> vs1(10,s2);
-    cout << vs.size() << endl;
-    cout << vs.capasity() << endl;
-    vs1 = vs;
-    show(vs1);
-    int&& v = 10;
-    int n = v;
+    student * s = new student(10,16);
+    ::operator delete(s);
+
+
+
 
 
 
