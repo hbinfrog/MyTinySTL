@@ -101,7 +101,9 @@
 				7,
 				8,
 				9,
-				10
+				10,
+				11,
+				12
 			]
 		}
 	],
@@ -161,6 +163,16 @@
 		{
 			"backtrace" : 1,
 			"path" : "exceptdef.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "list.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "functional.h",
 			"sourceGroupIndex" : 1
 		}
 	],

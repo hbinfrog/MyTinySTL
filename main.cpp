@@ -5,6 +5,7 @@
 #include "util.h"
 #include "algobase.h"
 #include "vector.h"
+#include "list.h"
 #include <string>
 using namespace mystl;
 using std::cout;
@@ -70,13 +71,30 @@ template <class T>
 T add(T x, T y){
     return x + y;
 }
+void show1(list<int>& l){
+    for(list<int>::iterator it = l.begin(); it != l.end(); ++it){
+        cout << *it << " ";
+    }
+    cout << endl;
+
+}
 
 
 
 
 int main() {
-    student * s = new student(10,16);
-    ::operator delete(s);
+    list<int> l1(3, 5);
+    int a[6] = {1,2,3,4,5,6};
+    cout << a << endl;
+    show1(l1);
+    list<int> l4(a, a + 6);
+    show1(l4);
+    list<int> l2({1,2,3});
+    list<int> l3(l2);
+    show1(l2);
+    show1(l3);
+
+
 
 
 
