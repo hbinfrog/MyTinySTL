@@ -21,8 +21,7 @@ namespace mystl{
     }
     template <typename T1, typename... Args>
     void construct(T1* ptr, Args&&...args){
-        //
-        ::new ((void*)ptr) T1(mystl::forward<Args>(args)...);
+        ::new ((void *)ptr) T1(mystl::forward<Args>(args)...);
     }
     template <typename T>
     void destroy_one(T * pointer, std::true_type){}
@@ -53,7 +52,6 @@ namespace mystl{
     template <typename T>
     void destroy(T first, T last){
         destroy_sec(first, last, std::is_trivially_destructible<typename std::iterator_traits<T>::value_type>{});
-
     }//
 
 

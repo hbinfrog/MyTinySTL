@@ -10,16 +10,14 @@
 using namespace mystl;
 using std::cout;
 using std::endl;
-
-
-
-void init(int * a){
-    ::new ((void *) a) int(2);
-}
 class student{
 public:
     int Age;
     int *Score;
+    student(){
+        Age = 0;
+        Score = new int (0);
+    }
     student(int age, int score){
         Age = age;
         Score = new int (score);
@@ -33,15 +31,18 @@ public:
         Score = new int (*s.Score);
         return *this;
     }
+    bool operator==(const student& s){
+        return (Age == s.Age && *Score == *s.Score);
+    }
     bool operator!=(const student& s){
-        return (Age == s.Age && Score == s.Score);
+        return Age != s.Age || *Score != *s.Score;
     }
     ~student(){
         if(Score != nullptr){
             delete Score;
             Score = nullptr;
         }
-        cout << 1 << endl;
+        //cout << 1 << endl;
     }
 };
 
@@ -63,36 +64,94 @@ void show(vector<student> vs){
     }
     cout << endl;
 }
-vector<int> test(){
-    vector<int> v(10,2);
-    return v;
-}
-template <class T>
-T add(T x, T y){
-    return x + y;
-}
-void show1(list<int>& l){
+void show(list<int>& l){
     for(list<int>::iterator it = l.begin(); it != l.end(); ++it){
         cout << *it << " ";
     }
     cout << endl;
 
 }
+void show(list<student>& l){
+    for(list<student>::iterator it = l.begin(); it != l.end(); ++it){
+        cout << *it->Score << " " << it->Age << " ";
+    }
+    cout << endl;
+
+}
+class com{
+public:
+    bool operator()(const student& s1){
+        return s1.Age < 22;
+    }
+};
+class comp{
+public:
+    bool operator()(const student& s1, const student& s2){
+        return s1.Age < s2.Age;
+    }
+};
+bool operator==(const student& s1, const student& s2){
+    return (s1.Age == s2.Age && *s1.Score == *s2.Score);
+}
+
+bool operator<(const student& s1, const student& s2){
+    return s1.Age < s2.Age;
+}
+class un{
+public:
+    bool operator()(const student& s1, const student& s2){
+        return s1.Age == s2.Age;
+    }
+};
+
 
 
 
 
 int main() {
-    list<int> l1(3, 5);
-    int a[6] = {1,2,3,4,5,6};
-    cout << a << endl;
-    show1(l1);
-    list<int> l4(a, a + 6);
-    show1(l4);
-    list<int> l2({1,2,3});
-    list<int> l3(l2);
-    show1(l2);
-    show1(l3);
+    student s1(23,95);
+    student s2(21,100);
+    student s3(22,99);
+    student s4(23,88);
+    student s5(18,67);
+    student s6(27,88);
+    student s7(25,87);
+    student s[3] = {s3,s2,s1};
+    list<student> l(2,s1);
+    show(l);
+    l.insert(l.begin(),s, s + 3);
+    show(l);
+    l.emplace(l.begin(), mystl::move(s2));
+    show(l);
+    l.pop_back();
+    show(l);
+    l.pop_front();
+    show(l);
+    l.reverse();
+    show(l);
+    //mystl::swap()
+//    show(l1);
+    l.remove_if(com());
+    show(l);
+    l.emplace_back(s1);
+    l.emplace_front(s1);
+    show(l);
+    l.emplace_front(s4);
+    l.emplace_front(s4);
+    l.emplace_back(s4);
+    l.emplace_back(s4);
+    show(l);
+    l.unique(un());
+    show(l);
+    list<student> l3({s2,s3,s1});
+    list<student> l2({s5,s7,s6});
+    l3.merge(l2);
+    //l3.merge(l2,comp());
+    show(l3);
+
+
+
+
 
 
 

@@ -103,7 +103,8 @@
 				9,
 				10,
 				11,
-				12
+				12,
+				13
 			]
 		}
 	],
@@ -173,6 +174,11 @@
 		{
 			"backtrace" : 1,
 			"path" : "functional.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "deque.h",
 			"sourceGroupIndex" : 1
 		}
 	],

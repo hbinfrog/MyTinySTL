@@ -71,13 +71,14 @@ namespace mystl{
     }
     template <class T>
     void allocator<T>::construct(T * ptr, T&& value){
-
+        mystl::construct(ptr, mystl::move(value));
     }
     template <class T>
     template <class ...Args>
     void allocator<T>::construct(T* ptr, Args&& ...args)
     {
         //mystl::construct(ptr, mystl::forward<Args>(args)...);
+        mystl::construct(ptr, mystl::forward<Args>(args)...);
     }
     template <class T>
     void allocator<T>::destroy(T* ptr){
