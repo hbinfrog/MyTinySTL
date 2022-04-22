@@ -63,7 +63,7 @@ namespace mystl{
         return unchecked_copy(first, last, result);
     }
     template <class B1, class B2>
-    B2 unchecked_move_back_sec(B1 first, B1 last, B2 result, mystl::bidirectional_iterator_tag){
+    B2 unchecked_copy_back_sec(B1 first, B1 last, B2 result, mystl::bidirectional_iterator_tag){
         while(first != last){
             result--;
             last--;
@@ -72,7 +72,7 @@ namespace mystl{
         return result;
     }
     template <class B1, class B2>
-    B2 unchecked_move_back_sec(B1 first, B1 last, B2 result, mystl::random_access_iterator_tag){
+    B2 unchecked_copy_back_sec(B1 first, B1 last, B2 result, mystl::random_access_iterator_tag){
         for(auto n = last - first; n > 0; n--){
             result--;
             last--;
@@ -81,8 +81,8 @@ namespace mystl{
         return result;
     }
     template <class B1, class B2>
-    B2 unchecked_move_back(B1 first, B1 last, B2 result){
-        return unchecked_move_back_sec(first, last, result, iterator_category(first));
+    B2 unchecked_copy_back(B1 first, B1 last, B2 result){
+        return unchecked_copy_back_sec(first, last, result, iterator_category(first));
     }
     template <class Tp, class Up>
     typename std::enable_if<std::is_same<typename std::remove_const<Tp>::type, Up>::value
@@ -270,7 +270,32 @@ namespace mystl{
         return result != 0 ? result < 0 : len1 < len2;
     }
 
+    /*****************************************************************************************/
+// fill
+// 为 [first, last)区间内的所有元素填充新值
+/*****************************************************************************************/
+    template <class ForwardIter, class T>
+    void fill_cat(ForwardIter first, ForwardIter last, const T& value,
+                  mystl::forward_iterator_tag)
+    {
+        for (; first != last; ++first)
+        {
+            *first = value;
+        }
+    }
 
+    template <class RandomIter, class T>
+    void fill_cat(RandomIter first, RandomIter last, const T& value,
+                  mystl::random_access_iterator_tag)
+    {
+        fill_n(first, last - first, value);
+    }
+
+    template <class ForwardIter, class T>
+    void fill(ForwardIter first, ForwardIter last, const T& value)
+    {
+        fill_cat(first, last, value, iterator_category(first));
+    }
 
 
 }

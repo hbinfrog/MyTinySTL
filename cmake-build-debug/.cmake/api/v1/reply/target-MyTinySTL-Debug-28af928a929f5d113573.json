@@ -104,7 +104,9 @@
 				10,
 				11,
 				12,
-				13
+				13,
+				14,
+				15
 			]
 		}
 	],
@@ -179,6 +181,16 @@
 		{
 			"backtrace" : 1,
 			"path" : "deque.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "stack.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "queue.h",
 			"sourceGroupIndex" : 1
 		}
 	],

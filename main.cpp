@@ -7,6 +7,9 @@
 #include "vector.h"
 #include "list.h"
 #include <string>
+#include "deque.h"
+#include <deque>
+
 using namespace mystl;
 using std::cout;
 using std::endl;
@@ -103,6 +106,24 @@ public:
         return s1.Age == s2.Age;
     }
 };
+void show(deque<int>& d){
+    for(deque<int>::iterator it = d.begin(); it != d.end(); it++){
+        cout << *it << " ";
+    }
+    cout << endl;
+}
+void show(deque<student>& d){
+    for(deque<student>::iterator it = d.begin(); it != d.end(); it++){
+        cout << it->Age << " " << *it->Score << " ";
+    }
+    cout << endl;
+}
+void show(std::deque<int>& d){
+    for(std::deque<int>::iterator it = d.begin(); it != d.end(); it++){
+        cout << *it << " ";
+    }
+    cout << endl;
+}
 
 
 
@@ -112,51 +133,37 @@ int main() {
     student s1(23,95);
     student s2(21,100);
     student s3(22,99);
-    student s4(23,88);
-    student s5(18,67);
-    student s6(27,88);
-    student s7(25,87);
-    student s[3] = {s3,s2,s1};
-    list<student> l(2,s1);
-    show(l);
-    l.insert(l.begin(),s, s + 3);
-    show(l);
-    l.emplace(l.begin(), mystl::move(s2));
-    show(l);
-    l.pop_back();
-    show(l);
-    l.pop_front();
-    show(l);
-    l.reverse();
-    show(l);
-    //mystl::swap()
-//    show(l1);
-    l.remove_if(com());
-    show(l);
-    l.emplace_back(s1);
-    l.emplace_front(s1);
-    show(l);
-    l.emplace_front(s4);
-    l.emplace_front(s4);
-    l.emplace_back(s4);
-    l.emplace_back(s4);
-    show(l);
-    l.unique(un());
-    show(l);
-    list<student> l3({s2,s3,s1});
-    list<student> l2({s5,s7,s6});
-    l3.merge(l2);
-    //l3.merge(l2,comp());
-    show(l3);
-
-
-
-
-
-
-
-
-
+    deque<student> d({s1,s2,s3,s2,s3,s1,s2,s3,s2,s1});
+    show(d);
+    d.push_back(s1);
+    show(d);
+    d.pop_back();
+    d.pop_back();
+    d.pop_front();
+    d.pop_front();
+    show(d);
+    std::deque<int> sd;
+    for(int i = 0; i < 10; i++){
+        sd.push_back(i);
+    }
+    sd.insert(sd.begin() + 3, 5);
+    show(sd);
+    sd.insert(sd.begin() + 10, 5);
+    show(sd);
+    deque<int> dq;
+    for(int i = 0; i < 10; i++){
+        dq.push_back(i);
+    }
+    dq.emplace(dq.begin() + 3, 5);
+    show(dq);
+    dq.emplace(dq.begin() + 10, 5);
+    show(dq);
+    dq.insert(dq.begin(),5,8);
+    show(dq);
+    dq.insert(dq.end(),7,1);
+    show(dq);
+    dq.insert(dq.begin()+5,6,0);
+    show(dq);
 
 
 

@@ -2,16 +2,16 @@
 // Created by hbin on 2022/4/18.
 //
 
+//非环状双向链表
+
 #ifndef MYTINYSTL_LIST_H
 #define MYTINYSTL_LIST_H
 #include <initializer_list>
-
 #include "iterator.h"
 #include "memory.h"
 #include "functional.h"
 #include "util.h"
 #include "exceptdef.h"
-#include <list>
 
 namespace mystl{
     template <class T>
@@ -830,9 +830,6 @@ namespace mystl{
     {
         lhs.swap(rhs);
     }
-
-
-
 }
 #endif //MYTINYSTL_LIST_H
 
