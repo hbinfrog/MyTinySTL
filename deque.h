@@ -55,6 +55,7 @@ namespace mystl{
                 last = rhs.last;
                 node = rhs.node;
             }
+            return *this;
         }
         void set_node(map_pointer new_node){
             node = new_node;
@@ -342,10 +343,6 @@ namespace mystl{
         void reallocate_map(size_type add_buffer, bool back);//back == 1表示在后拓展，back == 0表示在前拓展
         template <class... Args>
         iterator insert_aux(iterator pos, Args&& ...args);
-
-
-
-
     };
     template<class T>
     void deque<T>::map_init(size_type n){
@@ -453,24 +450,12 @@ namespace mystl{
             const size_type n = size();
             auto result = begin_;
             if(rhs.size() <= n){
-                for(auto cur_ = rhs.begin_; cur_ != rhs.end_; ++cur_, ++result){
-                    *result = *cur_;
-                }
-                data_allocator::destroy(result.cur, end_.cur);
-                end_ = result;
+                erase(mystl::copy(rhs.begin_, rhs.end_, begin_), end_);
             }
             else{
-                iterator mid = rhs.begin_ + static_cast<diff_type>(n);
-                for(auto cur_ = rhs.begin_; cur_ != mid; ++cur_, ++result){
-                    *result = *cur_;
-                }
-                const size_type add_size = mystl::distance(mid, rhs.end_);
-                //TO DO
-
-                //
-
-
-
+                iterator mid = rhs.begin() + static_cast<diff_type>(n);
+                mystl::copy(rhs.begin_, mid, begin_);
+                insert(end_, mid, rhs.end_);
             }
         }
         return *this;
@@ -844,16 +829,52 @@ namespace mystl{
     }
     template <class T>
     void deque<T>::assign(size_type n, const value_type& value){
+        if(size() < n){
+            for(auto cur_ = begin_; cur_ != end_; ++cur_){
+                *cur_ = value;
+            }
+            insert(end_, n - size(), value);
+        }
+        else{
+            erase(begin_ + n, end_);
+            for(auto cur_ = begin_; cur_ != end_; ++cur_){
+                *cur_ = value;
+            }
+        }
 
     }
     template <class T>
     typename deque<T>::iterator deque<T>::erase(iterator pos){
-
+        auto next = pos;
+        next++;
+        const size_type n = pos - begin_;
+        if(n < size() / 2){
+            mystl::copy_back(begin_, pos, next);
+            pop_front();
+        }
+        else{
+            mystl::copy(next, end_, pos);
+            pop_back();
+        }
+        return begin_ + n;
     }
     template <class T>
     typename deque<T>::iterator deque<T>::erase(iterator first, iterator last){
-
-
+        const diff_type n = last - first;
+        const size_type diff = first - begin_;
+        if(diff < (size() - n) / 2){
+            mystl::copy_back(first,begin_,last);
+            iterator new_begin = begin_ + n;
+            data_allocator::destroy(begin_.cur, new_begin.cur);
+            begin_ = new_begin;
+        }
+        else{
+            mystl::copy(last, end_, first);
+            iterator new_end = end_ - n;
+            data_allocator::destroy(new_end.cur, end_.cur);
+            end_ = new_end;
+        }
+        return begin_ + n;
     }
 
 

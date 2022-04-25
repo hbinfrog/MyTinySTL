@@ -8,7 +8,10 @@
 #include "list.h"
 #include <string>
 #include "deque.h"
-#include <deque>
+#include "stack.h"
+#include "queue.h"
+#include <algorithm>
+#include <queue>
 
 using namespace mystl;
 using std::cout;
@@ -118,9 +121,17 @@ void show(deque<student>& d){
     }
     cout << endl;
 }
-void show(std::deque<int>& d){
-    for(std::deque<int>::iterator it = d.begin(); it != d.end(); it++){
-        cout << *it << " ";
+void show(stack<int> s) {
+    while (!s.empty()) {
+        cout << s.pop() << " ";
+    }
+    cout << endl;
+}
+void show(std::priority_queue<int> pq){
+    while (!pq.empty()){
+        int a = pq.top();
+        cout << a << " ";
+        pq.pop();
     }
     cout << endl;
 }
@@ -129,43 +140,31 @@ void show(std::deque<int>& d){
 
 
 
-int main() {
-    student s1(23,95);
-    student s2(21,100);
-    student s3(22,99);
-    deque<student> d({s1,s2,s3,s2,s3,s1,s2,s3,s2,s1});
-    show(d);
-    d.push_back(s1);
-    show(d);
-    d.pop_back();
-    d.pop_back();
-    d.pop_front();
-    d.pop_front();
-    show(d);
-    std::deque<int> sd;
-    for(int i = 0; i < 10; i++){
-        sd.push_back(i);
-    }
-    sd.insert(sd.begin() + 3, 5);
-    show(sd);
-    sd.insert(sd.begin() + 10, 5);
-    show(sd);
-    deque<int> dq;
-    for(int i = 0; i < 10; i++){
-        dq.push_back(i);
-    }
-    dq.emplace(dq.begin() + 3, 5);
-    show(dq);
-    dq.emplace(dq.begin() + 10, 5);
-    show(dq);
-    dq.insert(dq.begin(),5,8);
-    show(dq);
-    dq.insert(dq.end(),7,1);
-    show(dq);
-    dq.insert(dq.begin()+5,6,0);
-    show(dq);
 
+//int main() {
+//    deque<int> d({2,5,8,7,4,1,3,6,9});
+//    stack<int> s1(d);
+//
+//    bool ok = d.empty();
+//    show(s1);
+//
+//    stack<int> s2(s1);
+//    show(s2);
+//    queue<int> q(d);
+//    bool ok1 = q.empty();
+//    int a[] = {6,4,7,1};
+//    cout << -1 / 2 << endl;
+//    //std::push_heap()
+//
+//    std::priority_queue<int> pq(a,a+4);
+//    pq.push(10);
+int main () {
+    vector<int> v1({1,2,3,4,5});
+    v1.assign(3,4);
+    show(v1);
 
 
     return 0;
 }
+
+
