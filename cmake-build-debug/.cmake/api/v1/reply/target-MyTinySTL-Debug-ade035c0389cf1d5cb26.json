@@ -196,7 +196,7 @@
 		},
 		{
 			"backtrace" : 1,
-			"path" : "heap_algo.h",
+			"path" : "algo.h",
 			"sourceGroupIndex" : 1
 		}
 	],

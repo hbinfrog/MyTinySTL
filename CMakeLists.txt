@@ -3,4 +3,4 @@ project(MyTinySTL)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(MyTinySTL main.cpp vector.h allocator.h construct.h iterator.h type_traits.h util.h memory.h algobase.h uninitialized.h exceptdef.h list.h functional.h functional.h deque.h stack.h queue.h)
+add_executable(MyTinySTL main.cpp vector.h allocator.h construct.h iterator.h type_traits.h util.h memory.h algobase.h uninitialized.h exceptdef.h list.h functional.h functional.h deque.h stack.h queue.h algo.h)

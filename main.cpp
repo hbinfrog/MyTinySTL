@@ -159,9 +159,13 @@ void show(std::priority_queue<int> pq){
 //    std::priority_queue<int> pq(a,a+4);
 //    pq.push(10);
 int main () {
-    vector<int> v1({1,2,3,4,5});
-    v1.assign(3,4);
-    show(v1);
+    vector<int> v1(23,5);
+    cout << v1.size() << endl;
+    cout << v1.capacity() << endl;
+    v1.emplace(v1.begin(),3);
+    cout << v1.size() << endl;
+    cout << v1.capacity() << endl;
+
 
 
     return 0;

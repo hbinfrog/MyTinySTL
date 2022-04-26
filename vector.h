@@ -12,6 +12,7 @@
 #include "algobase.h"
 #include "exceptdef.h"
 #include "uninitialized.h"
+#include "algo.h"
 
 
 namespace mystl{
@@ -191,23 +192,30 @@ namespace mystl{
 
         iterator insert(const_iterator pos, const value_type& value);
         iterator insert(const_iterator pos, value_type&& value){
-
+            return emplace(pos, mystl::move(value));
         }
 
-        iterator insert(const_iterator pos, size_type n, const value_type& value){
-
-        }
+        iterator insert(const_iterator pos, size_type n, const value_type& value);
 
         template <class Iter, typename std::enable_if<mystl::is_input_iterator<Iter>::value, int>::type = 0>
         void insert(const_iterator pos, Iter first, Iter last){
-
+            MYSTL_DEBUG(pos >= begin() && pos <= end() && !(last < first));
+            copy_insert(const_cast<iterator>(pos), first, last);
         }
+
 
 
         iterator erase(const_iterator pos);
         iterator erase(const_iterator first, const_iterator last);
         void clear(){
             erase(begin(), end());
+        }
+        void resize(size_type new_size) {
+            resize(new_size, value_type());
+        }
+        void resize(size_type new_size, const value_type& value);
+        void reverse(){
+            mystl::reverse(begin(), end());
         }
 
 
@@ -225,6 +233,15 @@ namespace mystl{
         void copy_assign(InputIter first, InputIter last, input_iterator_tag);
         template <class ForwardIter>
         void copy_assign(ForwardIter first, ForwardIter last, forward_iterator_tag);
+        //size_type get_new_cap(size_type add_size);
+        template <class ...Args>
+        void reallocate_emplace(iterator pos, Args&& ...args);
+        void reallocate_insert(iterator pos, const value_type& value);
+        size_type expand(size_type add_size);
+        template <class InputIter>
+        void copy_insert(iterator pos, InputIter first, InputIter last);
+
+
 
 
 
@@ -324,6 +341,7 @@ namespace mystl{
             const size_type old_size = size();
             auto new_begin = data_allocator::allocate(n);
             mystl::uninitialized_move(begin_, end_, new_begin); //move里面已经包含了destroy
+            data_allocator::destroy(begin_, end_);
             data_allocator::deallocate(begin_, cap_ - begin_);
             begin_ = new_begin;
             end_ = new_begin + old_size;
@@ -414,16 +432,268 @@ namespace mystl{
             data_allocator::construct(mystl::address_of(*end_), *(end_ - 1));
             ++new_end;
             mystl::copy_back(xpos, end_ - 1, end_);
-            *pos = value_type(mystl::forward<Args>(args)...);
+            *xpos = value_type(mystl::forward<Args>(args)...);
             end_ = new_end;
         }
         else{
-
-
+            reallocate_emplace(xpos, mystl::forward<Args>(args)...);
         }
+        return begin() + n;
+    }
+    template <class T>
+    template <class... Args>
+    void vector<T>::emplace_back(Args&& ...args){
+        if(end_ < cap_){
+            data_allocator::construct(mystl::address_of(*end_), mystl::forward<Args>(args)...);
+            ++end_;
+        }
+        else{
+            reallocate_emplace(end_, mystl::forward<Args>(args)...);
+        }
+    }
+    template <class T>
+    template <class ...Args>
+    void vector<T>::reallocate_emplace(iterator pos, Args&& ...args){
+        const auto new_size = expand(1);
+        auto new_begin = data_allocator::allocate(new_size);
+        auto new_end = new_begin;
+        try{
+            new_end = mystl::uninitialized_move(begin_, pos, new_begin);
+            data_allocator::construct(mystl::address_of(*new_end), mystl::forward<Args>(args)...);
+            ++new_end;
+            new_end = mystl::uninitialized_move(pos, end_, new_end);
+        }
+        catch (...){
+            data_allocator::deallocate(new_begin, new_size);
+            throw;
+        }
+        destroy_and_recover(begin_, end_, cap_ - begin_);
+        begin_ = new_begin;
+        end_ = new_end;
+        cap_ = new_begin + new_size;
     }
 
 
+
+
+    template <class T>
+    typename vector<T>::size_type vector<T>::expand(size_type add_size){
+        if(end_ < cap_){
+            return;
+        }
+        const size_type new_cap = size() + add_size <=  2 * capacity() ? 2 * capacity() : size() + add_size;
+        return new_cap;
+    }
+    template <class T>
+    void vector<T>::push_back(const value_type& value){
+        if(end_ < cap_){
+            data_allocator::construct(mystl::address_of(*end_), value);
+            ++end_;
+        }
+        else{
+            reallocate_insert(end_, value);
+        }
+
+
+    }
+    template <class T>
+    void vector<T>::reallocate_insert(iterator pos, const value_type& value){
+        const auto new_size = expand(1);
+        auto new_begin = data_allocator::allocate(new_size);
+        auto new_end = new_begin;
+        const value_type& value_copy = value;
+        try{
+            new_end = mystl::uninitialized_move(begin_, pos, new_begin);
+            data_allocator::construct(mystl::address_of(*new_end), value_copy);
+            ++new_end;
+            new_end = mystl::uninitialized_move(pos, end_, new_end);
+        }
+        catch (...){
+            data_allocator::deallocate(new_begin, new_size);
+            throw;
+        }
+        destroy_and_recover(begin_, end_, cap_ - begin_);
+        begin_ = new_begin;
+        end_ = new_end;
+        cap_ = new_begin + new_size;
+    }
+    template <class T>
+    void vector<T>::pop_back(){
+        MYSTL_DEBUG(!empty());
+        data_allocator::destroy(end_ - 1);
+        --end_;
+    }
+    template <class T>
+    typename vector<T>::iterator vector<T>::insert(const_iterator pos, const value_type& value){
+        MYSTL_DEBUG(pos >= begin() && pos <= end());
+        iterator xpos = const_cast<iterator>(pos);
+        const size_type n = xpos - begin_;
+        if(end_ != cap_ && pos == end_){
+            data_allocator::construct(mystl::address_of(*end_), value);
+            ++end_;
+        }
+        else if(end_ != cap_){
+            iterator new_end = end_;
+            data_allocator::construct(mystl::address_of(*end_), *(end_ - 1));
+            ++new_end;
+            auto value_copy = value;
+            mystl::copy_back(xpos, end_ - 1, end_);
+            *xpos = mystl::move(value_copy);
+            end_ = new_end;
+        }
+        else{
+            reallocate_insert(xpos, value);
+        }
+        return begin_ + n;
+    }
+    template <class T>
+    typename vector<T>::iterator vector<T>::insert(const_iterator pos, size_type n, const value_type& value) {
+        MYSTL_DEBUG(pos >= begin() && pos <= end());
+        if (n == 0) {
+            return pos;
+        }
+        const size_type diff = pos - begin_;
+        const value_type value_copy = value;
+        if (static_cast<size_type>(cap_ - end_) >= n) {
+            const size_type nElems = end_ - pos;
+            auto old_end = end_;
+            if (nElems > n) {
+                mystl::uninitialized_copy(end_ - n, end_, end_);
+                end_ += n;
+                mystl::move_backward(pos, old_end - n, old_end);
+                mystl::uninitialized_fill_n(pos, n, value_copy);
+            } else {
+                end_ = mystl::uninitialized_fill_n(end_, n - nElems, value_copy);
+                end_ = mystl::uninitialized_move(pos, old_end, end_);
+                mystl::uninitialized_fill_n(pos, nElems, value_copy);
+            }
+        }
+        else {
+            const auto new_size = expand(n);
+            auto new_begin = data_allocator::allocate(new_size);
+            auto new_end = new_begin;
+            try {
+                new_end = mystl::uninitialized_move(begin_, pos, new_begin);
+                new_end = mystl::uninitialized_fill_n(new_end, n, value);
+                new_end = mystl::uninitialized_move(pos, end_, new_end);
+            }
+            catch (...) {
+                destroy_and_recover(new_begin, new_end, new_size);
+                throw;
+            }
+            data_allocator::destroy(begin_, end_);
+            data_allocator::deallocate(begin_, cap_ - begin_);
+            begin_ = new_begin;
+            end_ = new_end;
+            cap_ = begin_ + new_size;
+        }
+        return begin_ + diff;
+    }
+    template <class T>
+    template <class InputIter>
+    void vector<T>::copy_insert(iterator pos, InputIter first, InputIter last){
+        if(first == last){
+            return;
+        }
+        const auto  n = mystl::distance(first, last);
+        if((cap_ - end_) >= n){
+            const auto after_elems = end_ - pos;
+            auto old_end = end_;
+            if (after_elems > n){
+                end_ = mystl::uninitialized_copy(end_ - n, end_, end_);
+                mystl::move_backward(pos, old_end - n, old_end);
+                mystl::uninitialized_copy(first, last, pos);
+            }
+            else{
+                auto mid = first;
+                mystl::advance(mid, after_elems);
+                end_ = mystl::uninitialized_copy(mid, last, end_);
+                end_ = mystl::uninitialized_move(pos, old_end, end_);
+                mystl::uninitialized_copy(first, mid, pos);
+            }
+        }
+        else{
+            const auto new_size = get_new_cap(n);
+            auto new_begin = data_allocator::allocate(new_size);
+            auto new_end = new_begin;
+            try{
+                new_end = mystl::uninitialized_move(begin_, pos, new_begin);
+                new_end = mystl::uninitialized_copy(first, last, new_end);
+                new_end = mystl::uninitialized_move(pos, end_, new_end);
+            }
+            catch (...){
+                destroy_and_recover(new_begin, new_end, new_size);
+                throw;
+            }
+            data_allocator::deallocate(begin_, cap_ - begin_);
+            begin_ = new_begin;
+            end_ = new_end;
+            cap_ = begin_ + new_size;
+        }
+    }
+    template <class T>
+    typename vector<T>::iterator vector<T>::erase(const_iterator pos){
+        MYSTL_DEBUG(pos >= begin() && pos < end());
+        iterator xpos = begin_ + pos - begin();
+        mystl::move(xpos + 1, end_, xpos);
+        data_allocator::destroy(end_ - 1);
+        --end_;
+        return xpos;
+    }
+    template <class T>
+    typename vector<T>::iterator vector<T>::erase(const_iterator first, const_iterator last){
+        MYSTL_DEBUG(first >= begin() && last <= end() && !(last < first));
+        const auto n = first - begin();
+        iterator r = begin_ + (first - begin());
+        data_allocator::destroy(mystl::move(r + (last - first), end_, r), end_);
+        end_ = end_ - (last - first);
+        return begin_ + n;
+    }
+    template <class T>
+    void vector<T>::resize(size_type new_size, const value_type& value){
+        if(new_size < size()){
+            erase(begin_ + new_size, end_);
+        }
+        else{
+            insert(end_, new_size - size(), value);
+        }
+    }
+
+    template <class T>
+    bool operator==(const vector<T>& lhs, const vector<T>& rhs){
+        return lhs.size() == rhs.size() &&
+               mystl::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+
+    template <class T>
+    bool operator<(const vector<T>& lhs, const vector<T>& rhs){
+        return mystl::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), lhs.end());
+    }
+
+    template <class T>
+    bool operator!=(const vector<T>& lhs, const vector<T>& rhs){
+        return !(lhs == rhs);
+    }
+
+    template <class T>
+    bool operator>(const vector<T>& lhs, const vector<T>& rhs){
+        return rhs < lhs;
+    }
+
+    template <class T>
+    bool operator<=(const vector<T>& lhs, const vector<T>& rhs){
+        return !(rhs < lhs);
+    }
+
+    template <class T>
+    bool operator>=(const vector<T>& lhs, const vector<T>& rhs){
+        return !(lhs < rhs);
+    }
+
+    template <class T>
+    void swap(vector<T>& lhs, vector<T>& rhs){
+        lhs.swap(rhs);
+    }
 
 
 }

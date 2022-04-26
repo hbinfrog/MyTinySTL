@@ -213,6 +213,61 @@ namespace mystl{
         return unchecked_fill_n(first,n,val);
     }
 
+
+    template <class BidirectionalIter1, class BidirectionalIter2>
+    BidirectionalIter2
+    unchecked_move_backward_cat(BidirectionalIter1 first, BidirectionalIter1 last,
+                                BidirectionalIter2 result, mystl::bidirectional_iterator_tag)
+    {
+        while (first != last)
+            *--result = mystl::move(*--last);
+        return result;
+    }
+
+// random_access_iterator_tag 版本
+    template <class RandomIter1, class RandomIter2>
+    RandomIter2
+    unchecked_move_backward_cat(RandomIter1 first, RandomIter1 last,
+                                RandomIter2 result, mystl::random_access_iterator_tag)
+    {
+        for (auto n = last - first; n > 0; --n)
+            *--result = mystl::move(*--last);
+        return result;
+    }
+
+    template <class BidirectionalIter1, class BidirectionalIter2>
+    BidirectionalIter2
+    unchecked_move_backward(BidirectionalIter1 first, BidirectionalIter1 last,
+                            BidirectionalIter2 result)
+    {
+        return unchecked_move_backward_cat(first, last, result,
+                                           iterator_category(first));
+    }
+
+// 为 trivially_copy_assignable 类型提供特化版本
+    template <class Tp, class Up>
+    typename std::enable_if<
+            std::is_same<typename std::remove_const<Tp>::type, Up>::value &&
+            std::is_trivially_move_assignable<Up>::value,
+            Up*>::type
+    unchecked_move_backward(Tp* first, Tp* last, Up* result)
+    {
+        const size_t n = static_cast<size_t>(last - first);
+        if (n != 0)
+        {
+            result -= n;
+            std::memmove(result, first, n * sizeof(Up));
+        }
+        return result;
+    }
+
+    template <class BidirectionalIter1, class BidirectionalIter2>
+    BidirectionalIter2
+    move_backward(BidirectionalIter1 first, BidirectionalIter1 last, BidirectionalIter2 result)
+    {
+        return unchecked_move_backward(first, last, result);
+    }
+
     template <class InputIter, class OutputIter>
     bool equal(InputIter first1, InputIter last1, OutputIter first2){
         while (first1 != last1){
