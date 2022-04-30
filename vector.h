@@ -73,7 +73,11 @@ namespace mystl{
             swap(temp);
             return *this;
         }
-
+        ~vector(){
+            data_allocator::destroy(begin_, end_);
+            data_allocator::deallocate(begin_, cap_ - begin_);
+            begin_ = end_ = cap_ = nullptr;
+        }
 
 
 
@@ -463,11 +467,12 @@ namespace mystl{
             ++new_end;
             new_end = mystl::uninitialized_move(pos, end_, new_end);
         }
-        catch (...){
+        catch (...) {
             data_allocator::deallocate(new_begin, new_size);
             throw;
         }
-        destroy_and_recover(begin_, end_, cap_ - begin_);
+        data_allocator::destroy(begin_, end_);
+        data_allocator::deallocate(begin_, cap_ - begin_);
         begin_ = new_begin;
         end_ = new_end;
         cap_ = new_begin + new_size;
@@ -478,9 +483,6 @@ namespace mystl{
 
     template <class T>
     typename vector<T>::size_type vector<T>::expand(size_type add_size){
-        if(end_ < cap_){
-            return;
-        }
         const size_type new_cap = size() + add_size <=  2 * capacity() ? 2 * capacity() : size() + add_size;
         return new_cap;
     }

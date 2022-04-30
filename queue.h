@@ -118,7 +118,7 @@ namespace mystl{
     }
 
     template <class T, class Container = mystl::vector<T>, class Compare = mystl::less<typename Container::value_type>>
-    class priority_queue{//栈顶的元素满足一个关系如最大值
+    class priority_queue{
     public:
         typedef Container                           container_type;
         typedef Compare                             value_compare;
@@ -205,7 +205,7 @@ namespace mystl{
         }
         void pop(){
             pop_heap(c_.begin(), c_.end(), comp_);
-            c_.push_back();
+            c_.pop_back();
         }
         void clear(){
             while (!empty()){

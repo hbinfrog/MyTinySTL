@@ -10,7 +10,7 @@
 #include "deque.h"
 #include "stack.h"
 #include "queue.h"
-#include <algorithm>
+#include "algorithm.h"
 #include <queue>
 
 using namespace mystl;
@@ -48,7 +48,6 @@ public:
             delete Score;
             Score = nullptr;
         }
-        //cout << 1 << endl;
     }
 };
 
@@ -56,7 +55,7 @@ pair<int, char> test1(){
     pair<int, char> c(10,'s');
     return c;
 }
-void show(vector<int> v){
+void show(vector<int>& v){
     for(vector<int>::iterator it = v.begin(); it != v.end(); it++){
         cout << *it << " ";
     }
@@ -136,35 +135,13 @@ void show(std::priority_queue<int> pq){
     cout << endl;
 }
 
-
-
-
-
-
-//int main() {
-//    deque<int> d({2,5,8,7,4,1,3,6,9});
-//    stack<int> s1(d);
-//
-//    bool ok = d.empty();
-//    show(s1);
-//
-//    stack<int> s2(s1);
-//    show(s2);
-//    queue<int> q(d);
-//    bool ok1 = q.empty();
-//    int a[] = {6,4,7,1};
-//    cout << -1 / 2 << endl;
-//    //std::push_heap()
-//
-//    std::priority_queue<int> pq(a,a+4);
-//    pq.push(10);
 int main () {
-    vector<int> v1(23,5);
-    cout << v1.size() << endl;
-    cout << v1.capacity() << endl;
-    v1.emplace(v1.begin(),3);
-    cout << v1.size() << endl;
-    cout << v1.capacity() << endl;
+    vector<int> v({9,4,5,6,5,7});
+    //mystl::push_heap(v.begin(), v.end());
+    mystl::heap_down(v.begin(),v.end(), v.begin());
+    show(v);
+
+
 
 
 
