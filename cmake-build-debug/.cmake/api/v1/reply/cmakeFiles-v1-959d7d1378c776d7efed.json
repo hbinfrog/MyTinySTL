@@ -130,8 +130,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/Users/hbin/Desktop/clion/MyTinySTL/cmake-build-debug",
-		"source" : "/Users/hbin/Desktop/clion/MyTinySTL"
+		"build" : "/Users/hbin/Desktop/MyTinySTL/cmake-build-debug",
+		"source" : "/Users/hbin/Desktop/MyTinySTL"
 	},
 	"version" : 
 	{

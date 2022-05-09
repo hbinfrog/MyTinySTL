@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/hbin/Desktop/clion/MyTinySTL/cmake-build-debug"
+			"value" : "/Users/hbin/Desktop/MyTinySTL/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -579,7 +579,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/hbin/Desktop/clion/MyTinySTL"
+			"value" : "/Users/hbin/Desktop/MyTinySTL"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -1151,7 +1151,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/hbin/Desktop/clion/MyTinySTL/cmake-build-debug"
+			"value" : "/Users/hbin/Desktop/MyTinySTL/cmake-build-debug"
 		},
 		{
 			"name" : "MyTinySTL_IS_TOP_LEVEL",
@@ -1175,7 +1175,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/hbin/Desktop/clion/MyTinySTL"
+			"value" : "/Users/hbin/Desktop/MyTinySTL"
 		}
 	],
 	"kind" : "cache",

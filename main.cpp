@@ -11,7 +11,8 @@
 #include "stack.h"
 #include "queue.h"
 #include "algorithm.h"
-#include <queue>
+#include "string.h"
+#include <string>
 
 using namespace mystl;
 using std::cout;
@@ -126,20 +127,17 @@ void show(stack<int> s) {
     }
     cout << endl;
 }
-void show(std::priority_queue<int> pq){
-    while (!pq.empty()){
-        int a = pq.top();
-        cout << a << " ";
-        pq.pop();
-    }
-    cout << endl;
-}
+
+
 
 int main () {
-    vector<int> v({9,4,5,6,5,7});
-    //mystl::push_heap(v.begin(), v.end());
-    mystl::heap_down(v.begin(),v.end(), v.begin());
-    show(v);
+    string s(10, 'a');
+    for(int i = 0; i < 10; i++){
+        cout << s[i] << endl;
+    }
+    char c = s.at(9);
+    std::string s1 = "abcgd";
+    unsigned res = s1.find_first_of('z', 0);
 
 
 

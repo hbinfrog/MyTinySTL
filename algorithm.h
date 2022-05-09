@@ -9,6 +9,8 @@
 
 namespace mystl{
 
+
+    //heap
     template <class RandomIter>
     void heap_down(RandomIter first, RandomIter last, RandomIter target){
         auto t = target - first;
@@ -85,6 +87,20 @@ namespace mystl{
             heap_down(first, last, first + i, comp);
         }
 
+    }
+
+    template <class RandomIter>
+    void sort_heap(RandomIter first, RandomIter last){
+        while (last - first > 1){
+            mystl::pop_heap(first, last--);
+        }
+    }
+
+    template <class RandomIter, class Compared>
+    void sort_heap(RandomIter first, RandomIter last, Compared comp){
+        while (last - first > 1){
+            mystl::pop_heap(first, last--, comp);
+        }
     }
 
 }

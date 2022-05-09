@@ -7,6 +7,7 @@
 #include "deque.h"
 #include "vector.h"
 #include "functional.h"
+#include "algorithm.h"
 
 namespace mystl{
     template<class T, class Container = mystl::deque<T>>
@@ -135,46 +136,46 @@ namespace mystl{
         priority_queue() = default;
         priority_queue(const Compare& c) : c_(), comp_(c){}
         explicit priority_queue(size_type n) : c_(n){
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
         }
         priority_queue(size_type n, const value_type& value) : c_(n, value){
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
         }
         template <class InputIter>
         priority_queue(InputIter first, InputIter last) :c_(first, last){
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
         }
         priority_queue(std::initializer_list<T> ilist) : c_(ilist){
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
         }
         priority_queue(const Container& c) : c_(c){
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
         }
         priority_queue(Container&& c) : c_(mystl::move(c)){
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
         }
         priority_queue(const priority_queue& rhs) : c_(rhs.c_), comp_(rhs.comp_){
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
         }
         priority_queue(priority_queue&& rhs) : c_(mystl::move(rhs.c_)), comp_(rhs.comp_){
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
         }
         priority_queue& operator=(const priority_queue& rhs){
             c_ = rhs.c_;
             comp_ = rhs.comp_;
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
             return *this;
         }
         priority_queue& operator=(priority_queue&& rhs){
             c_ = mystl::move(rhs.c_);
             comp_ = rhs.comp_;
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
             return *this;
         }
         priority_queue& operator=(std::initializer_list<T> ilist){
             c_ = ilist;
             comp_ = value_compare();
-            make_heap(c_.begin(), c_.end(), comp_);
+            mystl::make_heap(c_.begin(), c_.end(), comp_);
             return *this;
         }
         ~priority_queue() = default;
@@ -193,18 +194,18 @@ namespace mystl{
         template <class... Args>
         void emplace(Args&& ...args){
             c_.emplace_back(mystl::forward<Args>(args)...);
-            push_heap(c_.begin(), c_.end(), comp_);
+            mystl::push_heap(c_.begin(), c_.end(), comp_);
         }
         void push(const value_type& value){
             c_.push_back(value);
-            push_heap(c_.begin(), c_.end(), comp_);
+            mystl::push_heap(c_.begin(), c_.end(), comp_);
         }
         void push(value_type&& value){
             c_.push_back(mystl::move(value));
-            push_heap(c_.begin(), c_.end(), comp_);
+            mystl::push_heap(c_.begin(), c_.end(), comp_);
         }
         void pop(){
-            pop_heap(c_.begin(), c_.end(), comp_);
+            mystl::pop_heap(c_.begin(), c_.end(), comp_);
             c_.pop_back();
         }
         void clear(){
@@ -225,28 +226,8 @@ namespace mystl{
             return lhs.c_ != rhs.c_;
         }
     private:
-        template <class RandomIter>
-        void push_heap(RandomIter first, RandomIter last);
-        template <class RandomIter, class Compared>
-        void push_heap(RandomIter first, RandomIter last, Compared comp);
-        template <class RandomIter>
-        void pop_heap(RandomIter first, RandomIter last);
-        template <class RandomIter, class Compared>
-        void pop_heap(RandomIter first, RandomIter last, Compared comp);
-        template <class RandomIter>
-        void sort_heap(RandomIter first, RandomIter last);
-        template <class RandomIter, class Compared>
-        void sort_heap(RandomIter first, RandomIter last, Compared comp);
-        template <class RandomIter>
-        void make_heap(RandomIter first, RandomIter last);
-        template <class RandomIter, class Compared>
-        void make_heap(RandomIter first, RandomIter last, Compared comp);
-    };
-    template <class T, class Container, class Compare>
-    template <class RandomIter>
-    void priority_queue<T, Container, Compare>::push_heap(RandomIter first, RandomIter last){
 
-    }
+    };
 
 
 }

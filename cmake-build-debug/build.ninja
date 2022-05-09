@@ -39,13 +39,13 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = /Users/hbin/Desktop/clion/MyTinySTL/cmake-build-debug/
+cmake_ninja_workdir = /Users/hbin/Desktop/MyTinySTL/cmake-build-debug/
 
 #############################################
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /Users/hbin/Desktop/clion/MyTinySTL/cmake-build-debug && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake --regenerate-during-build -S/Users/hbin/Desktop/clion/MyTinySTL -B/Users/hbin/Desktop/clion/MyTinySTL/cmake-build-debug
+  COMMAND = cd /Users/hbin/Desktop/MyTinySTL/cmake-build-debug && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake --regenerate-during-build -S/Users/hbin/Desktop/MyTinySTL -B/Users/hbin/Desktop/MyTinySTL/cmake-build-debug
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -57,7 +57,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /Users/hbin/Desktop/clion/MyTinySTL/cmake-build-debug && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  COMMAND = cd /Users/hbin/Desktop/MyTinySTL/cmake-build-debug && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
   DESC = No interactive CMake dialog available...
   restat = 1
 
@@ -72,7 +72,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 
 build cmake_object_order_depends_target_MyTinySTL: phony || CMakeFiles/MyTinySTL.dir
 
-build CMakeFiles/MyTinySTL.dir/main.cpp.o: CXX_COMPILER__MyTinySTL_Debug /Users/hbin/Desktop/clion/MyTinySTL/main.cpp || cmake_object_order_depends_target_MyTinySTL
+build CMakeFiles/MyTinySTL.dir/main.cpp.o: CXX_COMPILER__MyTinySTL_Debug /Users/hbin/Desktop/MyTinySTL/main.cpp || cmake_object_order_depends_target_MyTinySTL
   DEP_FILE = CMakeFiles/MyTinySTL.dir/main.cpp.o.d
   FLAGS = -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk -std=gnu++11
   OBJECT_DIR = CMakeFiles/MyTinySTL.dir
@@ -103,7 +103,7 @@ build MyTinySTL: CXX_EXECUTABLE_LINKER__MyTinySTL_Debug CMakeFiles/MyTinySTL.dir
 # =============================================================================
 
 #############################################
-# Folder: /Users/hbin/Desktop/clion/MyTinySTL/cmake-build-debug
+# Folder: /Users/hbin/Desktop/MyTinySTL/cmake-build-debug
 
 build all: phony MyTinySTL
 
