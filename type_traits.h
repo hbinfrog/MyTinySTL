@@ -15,8 +15,6 @@ namespace mystl{
     using my_bool_constant = my_integral_constant<bool, b>;
     typedef my_bool_constant<true> my_true_type;
     typedef my_bool_constant<false> my_false_type;
-//    typedef my_integral_constant<bool, true> my_true_type;
-//    typedef my_integral_constant<bool, false> my_false_type;
     template <class T1, class T2>
     struct pair;
     template <class T>

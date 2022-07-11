@@ -31,38 +31,29 @@ namespace mystl{
         static void construct(pointer ptr, Args&& ...args);
         static void destroy(pointer ptr);
         static void destroy(pointer first, pointer last);
-
-
     };
     template <class T>
     T* allocator<T>::allocate(){
         return static_cast<T*> (operator new(sizeof(T)));
-
     }
     template <class T>
     T* allocator<T>::allocate(size_type n){
         if(n == 0)
             return nullptr;
         return static_cast<T*> (operator new(n * sizeof(T)));
-
     }
     template <class T>
     void allocator<T>::deallocate(T * ptr){
         if(ptr == nullptr)
             return;
         ::operator delete(ptr);
-
     }
     template <class T>
     void allocator<T>::deallocate(T * ptr, size_type n){
         if(ptr == nullptr)
             return;
         ::operator delete(ptr);
-
-
-
     }
-
     template <class T>
     void allocator<T>::construct(T* ptr){
         mystl::construct(ptr);
@@ -91,9 +82,6 @@ namespace mystl{
     void allocator<T>::destroy(pointer first, pointer last){
         mystl::destroy(first, last);
     }
-
-
-
 }
 
 

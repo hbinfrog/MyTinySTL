@@ -12,8 +12,7 @@
 #include "queue.h"
 #include "algorithm.h"
 #include "string.h"
-#include <string>
-
+#include "hashtable.h"
 using namespace mystl;
 using std::cout;
 using std::endl;
@@ -131,13 +130,8 @@ void show(stack<int> s) {
 
 
 int main () {
-    string s(10, 'a');
-    for(int i = 0; i < 10; i++){
-        cout << s[i] << endl;
-    }
-    char c = s.at(9);
-    std::string s1 = "abcgd";
-    unsigned res = s1.find_first_of('z', 0);
+    hashtable<>
+
 
 
 
