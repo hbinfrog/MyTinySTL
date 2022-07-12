@@ -14,6 +14,8 @@
 #include "string.h"
 #include "hashtable.h"
 #include "unordered_set.h"
+#include <unordered_map>
+#include "unordered_map.h"
 using namespace mystl;
 using std::cout;
 using std::endl;
@@ -131,13 +133,14 @@ void show(stack<int> s) {
 
 
 int main () {
-    unordered_set<int> s;
-    for(int i = 0; i < 10; i++)
-    {
-        s.insert(i * 2);
-    }
-    s.insert(2);
-    cout << s.count(2) << endl;
+    unordered_map<int, string> u;
+    pair<int, string> p(10, "hbin");
+    u.insert(p);
+    string s = u.at(10);
+    string s1 = u[3];
+    cout << s << endl;
+    cout << s1 << endl;
+
 
 
 

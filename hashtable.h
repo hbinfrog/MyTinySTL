@@ -181,7 +181,7 @@ namespace mystl
         }
         reference operator*() const
         {
-            return this->node->val;
+            return this->node->value;
         }
         pointer operator->() const
         {
