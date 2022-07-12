@@ -221,7 +221,7 @@ namespace mystl{
         void reverse(){
             mystl::reverse(begin(), end());
         }
-
+        void swap(vector<T>& rhs) noexcept;
 
 
 
@@ -231,7 +231,7 @@ namespace mystl{
 
         template<class Iter>
         void range_init(Iter first, Iter last);
-        void swap(vector<T>& rhs) noexcept;
+
 
         template<class InputIter>
         void copy_assign(InputIter first, InputIter last, input_iterator_tag);

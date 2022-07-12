@@ -13,6 +13,7 @@
 #include "algorithm.h"
 #include "string.h"
 #include "hashtable.h"
+#include "unordered_set.h"
 using namespace mystl;
 using std::cout;
 using std::endl;
@@ -130,7 +131,15 @@ void show(stack<int> s) {
 
 
 int main () {
-    hashtable<>
+    unordered_set<int> s;
+    for(int i = 0; i < 10; i++)
+    {
+        s.insert(i * 2);
+    }
+    s.insert(2);
+    cout << s.count(2) << endl;
+
+
 
 
 

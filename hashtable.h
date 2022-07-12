@@ -381,7 +381,7 @@ namespace mystl
         bool operator!=(const self &other) const { return node != other.node; }
     };
 
-#define PRIME_NUM 99
+    #define PRIME_NUM 99
     static constexpr size_t ht_prime_list[] = {
             101ull, 173ull, 263ull, 397ull, 599ull, 907ull, 1361ull, 2053ull, 3083ull,
             4637ull, 6959ull, 10453ull, 15683ull, 23531ull, 35311ull, 52967ull, 79451ull,
@@ -624,6 +624,63 @@ namespace mystl
         size_type erase_unique(const key_type &key);
         pair<iterator, iterator> equal_range_multi(const key_type &key);
         pair<const_iterator, const_iterator> equal_range_multi(const key_type &key) const;
+        pair<iterator, iterator> equal_range_unique(const key_type &key);
+        pair<const_iterator, const_iterator> equal_range_unique(const key_type &key) const;
+
+        size_type count(const key_type &key) const;
+        iterator find(const key_type &key);
+        const_iterator find(const key_type &key) const;
+
+        local_iterator begin(size_type n) noexcept
+        {
+            MYSTL_DEBUG(n < size_);
+            return buckets_[n];
+        }
+        const_local_iterator begin(size_type n) const noexcept
+        {
+            MYSTL_DEBUG(n < size_);
+            return buckets_[n];
+        }
+        const_local_iterator cbegin(size_type n) const noexcept
+        {
+            MYSTL_DEBUG(n < size_);
+            return buckets_[n];
+        }
+
+        local_iterator end(size_type n) noexcept
+        {
+            MYSTL_DEBUG(n < size_);
+            return nullptr;
+        }
+        const_local_iterator end(size_type n) const noexcept
+        {
+            MYSTL_DEBUG(n < size_);
+            return nullptr;
+        }
+        const_local_iterator cend(size_type n) const noexcept
+        {
+            MYSTL_DEBUG(n < size_);
+            return nullptr;
+        }
+
+        size_type bucket_count() const noexcept
+        {
+            return bucket_size_;
+        }
+        size_type max_bucket_count() const noexcept
+        {
+            return ht_prime_list[PRIME_NUM - 1];
+        }
+        size_type bucket_size(size_type n) const noexcept;
+        size_type bucket(const key_type &key) const
+        {
+            return hash(key);
+        }
+
+        float load_factor() const noexcept
+        {
+            return bucket_size_ != 0 ? (float)size_ / bucket_size_ : 0.0f;
+        }
 
         float max_load_factor() const noexcept
         {
@@ -635,13 +692,20 @@ namespace mystl
             mlf_ = ml;
         }
         void rehash(size_type count);
+        void reserve(size_type count)
+        {
+            rehash(static_cast<size_type>((float)count / max_load_factor() + 0.5f));
+        }
+        hasher hash_fcn() const { return hash_; }
+        key_equal key_eq() const { return equal_; }
+        void clear();
 
     private:
         void init(size_type n);
         void copy_init(const hashtable &ht);
         template <class... Args>
         node_ptr create_node(Args &&...args);
-        void clear();
+
         void destroy_node(node_ptr node);
         void swap(hashtable &rhs) noexcept;
         size_type hash(const key_type &key, size_type n) const;
@@ -660,6 +724,8 @@ namespace mystl
         void copy_insert_unique(ForwardIter first, ForwardIter last, mystl::forward_iterator_tag);
         void erase_bucket(size_type n, node_ptr first, node_ptr last);
         void erase_bucket(size_type n, node_ptr last);
+        bool equal_to_multi(const hashtable &other);
+        bool equal_to_unique(const hashtable &other);
     };
     template <class T, class Hash, class KeyEqual>
     void hashtable<T, Hash, KeyEqual>::init(size_type n)
@@ -667,7 +733,7 @@ namespace mystl
         const auto bucket_nums = ht_next_prime(n);
         try
         {
-            buckets_.reverse(bucket_nums);
+            buckets_.reserve(bucket_nums);
             buckets_.assign(bucket_nums, nullptr);
         }
         catch (...)
@@ -924,7 +990,7 @@ namespace mystl
         }
         while (cur)
         {
-            if (is_equal(value_traits::get_key(cur->value)), value_traits::get_key(np->value))
+            if (is_equal(value_traits::get_key(cur->value), value_traits::get_key(np->value)))
             {
                 return mystl::make_pair(iterator(cur, this), false);
             }
@@ -941,12 +1007,6 @@ namespace mystl
         const auto n = hash(value_traits::get_key(value));
         auto tmp = create_node(value);
         auto cur = buckets_[n];
-        if (cur == nullptr)
-        {
-            buckets_[n] = cur;
-            ++size_;
-            return iterator(tmp, this);
-        }
         while (cur)
         {
             if (is_equal(value_traits::get_key(cur->value), value_traits::get_key(value)))
@@ -969,12 +1029,6 @@ namespace mystl
         const auto n = hash(value_traits::get_key(value));
         auto tmp = create_node(value);
         auto cur = buckets_[n];
-        if (cur == nullptr)
-        {
-            buckets_[n] = cur;
-            ++size_;
-            return iterator(tmp, this);
-        }
         while (cur)
         {
             if (is_equal(value_traits::get_key(cur->value), value_traits::get_key(value)))
@@ -996,6 +1050,16 @@ namespace mystl
         if ((float)(size_ + n) > bucket_size_ * max_load_factor())
             rehash(size_ + n);
         for (; first != last; ++first)
+            insert_multi_noresize(*first);
+    }
+    template <class T, class Hash, class KeyEqual>
+    template <class ForwardIter>
+    void hashtable<T, Hash, KeyEqual>::copy_insert_multi(ForwardIter first, ForwardIter last, mystl::forward_iterator_tag)
+    {
+        size_type n = mystl::distance(first, last);
+        if ((float)(size_ + n) > bucket_size_ * max_load_factor())
+            rehash(size_ + n);
+        for (; n > 0; --n, ++first)
             insert_multi_noresize(*first);
     }
     template <class T, class Hash, class KeyEqual>
@@ -1110,6 +1174,31 @@ namespace mystl
     template <class T, class Hash, class KeyEqual>
     typename hashtable<T, Hash, KeyEqual>::size_type hashtable<T, Hash, KeyEqual>::erase_multi(const key_type &key)
     {
+        auto p = equal_range_multi(key);
+        if (p.first.node)
+        {
+            erase(p.first, p.second);
+            return mystl::distance(p.first, p.second);
+        }
+        return 0;
+    }
+    template <class T, class Hash, class KeyEqual>
+    typename hashtable<T, Hash, KeyEqual>::size_type hashtable<T, Hash, KeyEqual>::erase_unique(const key_type &key)
+    {
+        const auto n = hash(key);
+        auto first = buckets_[n];
+        while (first)
+        {
+            if (is_equal(value_traits::get_key(first->value), key))
+            {
+                buckets_[n] = first->next;
+                destroy_node(first);
+                --size_;
+                return 1;
+            }
+            first = first->next;
+        }
+        return 0;
     }
 
     template <class T, class Hash, class KeyEqual>
@@ -1119,8 +1208,168 @@ namespace mystl
         const auto n = hash(key);
         for (auto first = buckets_[n]; first; first = first->next)
         {
-            //if (is_equal())
+            if (is_equal(value_traits::get_key(first->value), key))
+            {
+                for (node_ptr second = first->next; second; second = second->next)
+                {
+                    if (!is_equal(value_traits::get_key(second->value), key))
+                        return mystl::make_pair(iterator(first, this), iterator(second, this));
+                }
+                for (auto m = n + 1; m < bucket_size_; m++)
+                {
+                    if (buckets_[m])
+                        return mystl::make_pair(iterator(first, this), iterator(buckets_[m], this));
+                }
+                return mystl::make_pair(iterator(first, this), end());
+            }
         }
+        return mystl::make_pair(end(), end());
+    }
+    template <class T, class Hash, class KeyEqual>
+    pair<typename hashtable<T, Hash, KeyEqual>::const_iterator, typename hashtable<T, Hash, KeyEqual>::const_iterator>
+    hashtable<T, Hash, KeyEqual>::equal_range_multi(const key_type &key) const
+    {
+        const auto n = hash(key);
+        for (node_ptr first = buckets_[n]; first; first = first->next)
+        {
+            if (is_equal(value_traits::get_key(first->value), key))
+            {
+                for (node_ptr second = first->next; second; second = second->next)
+                {
+                    if (!is_equal(value_traits::get_key(second->value), key))
+                        return mystl::make_pair(M_cit(first), M_cit(second));
+                }
+                for (auto m = n + 1; m < bucket_size_; ++m)
+                {
+                    if (buckets_[m])
+                        return mystl::make_pair(M_cit(first), M_cit(buckets_[m]));
+                }
+                return mystl::make_pair(M_cit(first), cend());
+            }
+        }
+        return mystl::make_pair(cend(), cend());
+    }
+    template <class T, class Hash, class KeyEqual>
+    typename hashtable<T, Hash, KeyEqual>::size_type hashtable<T, Hash, KeyEqual>::count(const key_type &key) const
+    {
+        const auto n = hash(key);
+        size_type sum = 0;
+        for (node_ptr cur = buckets_[n]; cur; cur = cur->next)
+        {
+            if (is_equal(value_traits::get_key(cur->value), key))
+                ++sum;
+        }
+        return sum;
+    }
+    template <class T, class Hash, class KeyEqual>
+    typename hashtable<T, Hash, KeyEqual>::iterator hashtable<T, Hash, KeyEqual>::find(const key_type &key)
+    {
+        const auto n = hash(key);
+        node_ptr first = buckets_[n];
+        while (first && !is_equal(value_traits::get_key(first->value), key))
+        {
+            first = first->next;
+        }
+        return iterator(first, this);
+    }
+    template <class T, class Hash, class KeyEqual>
+    typename hashtable<T, Hash, KeyEqual>::const_iterator hashtable<T, Hash, KeyEqual>::find(const key_type &key) const
+    {
+        const auto n = hash(key);
+        node_ptr first = buckets_[n];
+        while (first && !is_equal(value_traits::get_key(first->value), key))
+        {
+            first = first->next;
+        }
+        return M_cit(first);
+    }
+    template <class T, class Hash, class KeyEqual>
+    pair<typename hashtable<T, Hash, KeyEqual>::iterator, typename hashtable<T, Hash, KeyEqual>::iterator>
+    hashtable<T, Hash, KeyEqual>::equal_range_unique(const key_type &key)
+    {
+        const auto n = hash(key);
+        for (node_ptr first = buckets_[n]; first; first = first->next)
+        {
+            if (is_equal(value_traits::get_key(first->value), key))
+            {
+                if (first->next)
+                    return mystl::make_pair(iterator(first, this), iterator(first->next, this));
+                for (auto m = n + 1; m < bucket_size_; ++m)
+                {
+                    if (buckets_[m])
+                        return mystl::make_pair(iterator(first, this), iterator(buckets_[m], this));
+                }
+                return mystl::make_pair(iterator(first, this), end());
+            }
+        }
+        return mystl::make_pair(end(), end());
+    }
+    template <class T, class Hash, class KeyEqual>
+    pair<typename hashtable<T, Hash, KeyEqual>::const_iterator, typename hashtable<T, Hash, KeyEqual>::const_iterator>
+    hashtable<T, Hash, KeyEqual>::equal_range_unique(const key_type &key) const
+    {
+        const auto n = hash(key);
+        for (node_ptr first = buckets_[n]; first; first = first->next)
+        {
+            if (is_equal(value_traits::get_key(first->value), key))
+            {
+                if (first->next)
+                    return mystl::make_pair(M_cit(first), M_cit(first->next));
+                for (auto m = n + 1; m < bucket_size_; ++m)
+                {
+                    if (buckets_[m])
+                        return mystl::make_pair(M_cit(first), M_cit(buckets_[m]));
+                }
+                return mystl::make_pair(M_cit(first), cend());
+            }
+        }
+        return mystl::make_pair(cend(), cend());
+    }
+    template <class T, class Hash, class KeyEqual>
+    typename hashtable<T, Hash, KeyEqual>::size_type hashtable<T, Hash, KeyEqual>::bucket_size(size_type n) const noexcept
+    {
+        size_type sum = 0;
+        for (auto cur = buckets_[n]; cur; cur = cur->next)
+        {
+            ++sum;
+        }
+        return sum;
+    }
+    template <class T, class Hash, class KeyEqual>
+    bool hashtable<T, Hash, KeyEqual>::equal_to_multi(const hashtable &other)
+    {
+        if (size_ != other.size_)
+            return false;
+        for (auto f = begin(), l = end(); f != l;)
+        {
+            auto p1 = equal_range_multi(value_traits::get_key(*f));
+            auto p2 = other.equal_range_multi(value_traits::get_key(*f));
+            if (mystl::distance(p1.first, p1.second) != mystl::distance(p2.first, p2.second) ||
+                !mystl::is_permutation(p1.first, p2.second, p2.first, p2.second))
+                return false;
+            f = p1.second;
+        }
+        return true;
+    }
+
+    template <class T, class Hash, class KeyEqual>
+    bool hashtable<T, Hash, KeyEqual>::equal_to_unique(const hashtable &other)
+    {
+        if (size_ != other.size_)
+            return false;
+        for (auto f = begin(), l = end(); f != l; ++f)
+        {
+            auto res = other.find(value_traits::get_key(*f));
+            if (res.node == nullptr || *res != *f)
+                return false;
+        }
+        return true;
+    }
+    template <class T, class Hash, class KeyEqual>
+    void swap(hashtable<T, Hash, KeyEqual>& lhs,
+              hashtable<T, Hash, KeyEqual>& rhs) noexcept
+    {
+        lhs.swap(rhs);
     }
 }
 
